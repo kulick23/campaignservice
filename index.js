@@ -10,7 +10,6 @@ let campaigns = [
   { id: '2', title: 'Education for All', goal: 20000 },
 ];
 
-// GraphQL схема
 const schema = buildSchema(`
   type Campaign {
     id: ID!
@@ -24,21 +23,20 @@ const schema = buildSchema(`
   }
 `);
 
-// Резолверы
 const root = {
   campaigns: () => campaigns,
   campaign: ({ id }) => campaigns.find(c => c.id === id),
 };
 
-// REST API как было
 app.get('/campaigns', (_, res) => res.json(campaigns));
 
 app.use('/graphql', graphqlHTTP({
   schema: schema,
   rootValue: root,
-  graphiql: true, // Включает UI для тестирования в браузере
+  graphiql: true,
 }));
 
-app.listen(3001, () => {
-  console.log('Campaign service running on port 3001');
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => {
+  console.log('Campaign service running on port', PORT);
 });
