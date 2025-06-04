@@ -10,7 +10,7 @@ app.use(express.json());
 let db;
 MongoClient.connect(process.env.MONGO_URL, { useUnifiedTopology: true })
   .then(client => {
-    db = client.db(); // или client.db('название_базы_данных')
+db = client.db('charity');
     console.log("Connected to MongoDB");
   })
   .catch(err => {
