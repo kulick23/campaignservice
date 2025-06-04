@@ -43,7 +43,10 @@ app.use(
 );
 app.get("/ping", (_, res) => res.send("pong"));
 app.get("/health", (_, res) => res.json({ status: "ok" }));
-app.get("/metrics", (_, res) => res.json({ campaigns: campaigns.length }));
+app.get("/metrics", async (_, res) => {
+  const count = await db.collection('campaigns').countDocuments();
+  res.json({ campaigns: count });
+});
 
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => console.log(`Campaign service running on ${PORT}`));
