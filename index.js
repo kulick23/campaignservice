@@ -4,6 +4,14 @@ const { MongoClient } = require('mongodb');
 const { graphqlHTTP } = require("express-graphql");
 const { buildSchema } = require("graphql");
 
+// --- добавляем Prometheus client ---
+const client = require('prom-client');
+client.collectDefaultMetrics();           // сбор дефолтных метрик
+const campaignsGauge = new client.Gauge({ // метрика число кампаний
+  name: 'campaigns_count',
+  help: 'Number of campaigns in MongoDB'
+});
+
 const app = express();
 app.use(express.json());
 
@@ -45,7 +53,9 @@ app.get("/ping", (_, res) => res.send("pong"));
 app.get("/health", (_, res) => res.json({ status: "ok" }));
 app.get("/metrics", async (_, res) => {
   const count = await db.collection('campaigns').countDocuments();
-  res.json({ campaigns: count });
+  campaignsGauge.set(count);
+  res.set('Content-Type', client.register.contentType);
+  res.send(await client.register.metrics());
 });
 
 const PORT = process.env.PORT || 3002;
